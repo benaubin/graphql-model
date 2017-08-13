@@ -1,7 +1,11 @@
 require "graphql/model/version"
+require "graphql/model/query/selection"
+require "graphql/model/query/fragment"
 
-module Graphql
+module GraphQL
   module Model
-    # Your code goes here...
+    def self.query(&block)
+      Query::Selection.query(&block)
+    end
   end
 end

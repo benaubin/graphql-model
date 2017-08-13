@@ -12,3 +12,9 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 end
+
+RSpec::Matchers.define :be_query do |expected|
+  match do |actual|
+    actual.to_query == expected
+  end
+end
