@@ -16,6 +16,7 @@ module GraphQL::Model
         def query(parent: nil, &block)
           query = Selection.new(parent: parent)
           query.send :instance_exec, &block
+          query.to_query
           query
         end
       end
@@ -26,7 +27,7 @@ module GraphQL::Model
 
       def to_query
         p @dependent_fragments if @dependent_fragments.length > 1
-        (@fields + @dependent_fragments).flat_map(&:to_query)
+        @query_cache ||= (@fields + @dependent_fragments).flat_map(&:to_query)
       end
 
       def _(fragment = nil)
@@ -50,6 +51,7 @@ module GraphQL::Model
       end
 
       def add_field(field_alias = nil, name, **args, &block)
+        @query_cache = nil
         @fields << Query::Field.new(field_alias, name, parent: self, **args, &block)
       end
 
@@ -59,6 +61,7 @@ module GraphQL::Model
         end
         return fragment if @dependent_fragments.include? fragment
 
+        @query_cache = nil
         @dependent_fragments.push fragment
         fragment
       end
