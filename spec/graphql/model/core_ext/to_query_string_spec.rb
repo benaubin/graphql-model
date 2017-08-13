@@ -22,7 +22,7 @@ end
 
 RSpec.describe Hash do
   describe("#to_query_string") do
-    it 'converts a hash to a query argument' do
+    it 'converts a hash to a query string' do
       expect({type: :foo, amount: 1, correct: true, potatoes: ["green", "ripe"]}.to_query_string).to(
         eq('(type: foo, amount: 1, correct: true, potatoes: ["green", "ripe"])'))
     end
