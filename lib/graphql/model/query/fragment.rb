@@ -6,27 +6,36 @@ module GraphQL::Model
     class Fragment
       attr_accessor :name, :type, :selection
 
-      def initialize(name, type, cache: true, &block)
+      def initialize(name, type, &block)
         self.name = name
         self.type = type
         self.selection = Query::Selection.query(&block)
-
-        self.cache cache
       end
 
       class << self
-        def method_missing(name, type, cache: true, &block)
-          Fragment.new(name, type, cache: cache, &block)
+        def method_missing(name, type = nil, save: true, &block)
+          p name
+          if type
+            fragment = Fragment.new(name, type, &block)
+            self._fragments[name.to_s.camelize(:lower).to_sym] = fragment if save
+            fragment
+          else
+            self._fragments[name.to_s.camelize(:lower).to_sym]
+          end
+        end
+
+        def _fragments
+          @fragments ||= {}
         end
       end
 
       def name=(v)
-        reset_header
         @name = v
+        reset_header_cache
       end
       def type=(v)
-        reset_header
         @type = v
+        reset_header_cache
       end
 
       def fragment_name
@@ -36,23 +45,11 @@ module GraphQL::Model
         @type_name ||= type.to_s.camelize.to_sym
       end
 
-      def cache(should_cache = nil)
-        if should_cache.nil?
-          @cache && @query
-        elsif should_cache
-          @cache = true
-          to_query
-        else
-          @cache = false
-          @query = nil
-        end
-      end
-
       def to_query
         query = [header]
         query << selection.to_query
 
-        cache || (@query = query)
+        @query ||= query
       end
 
       def included
@@ -64,10 +61,11 @@ module GraphQL::Model
       def header
         @header ||= [:fragment, fragment_name, :on, type_name].join(" ")
       end
-      def reset_header
+      def reset_header_cache
         @fragment_name = nil
         @type_name = nil
         @header = nil
+        header
       end
     end
   end

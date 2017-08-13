@@ -29,8 +29,12 @@ module GraphQL::Model
         (@fields + @dependent_fragments).flat_map(&:to_query)
       end
 
-      def _(fragment)
-        @fields << add_dependent_fragment(fragment).included
+      def _(fragment = nil)
+        if fragment == nil
+          Fragment
+        else
+          @fields << add_dependent_fragment(fragment).included
+        end
       end
 
       def to_s
