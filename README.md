@@ -1,8 +1,6 @@
-# Graphql::Model
+# GraphQL::Model
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/graphql/model`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+A Ruby library to make using GraphQL 100% more awesome
 
 ## Installation
 
@@ -22,7 +20,40 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Write it as Ruby.
+
+```ruby
+query = GraphQL::Model.query do
+  graphQLClient(language: :ruby, best: true) do
+    title
+    description
+  end
+end.to_query_string
+```
+
+It works just like GraphQL.
+
+```graphql
+{
+  graphQLClient(language: ruby, best: true) {
+    title
+    description
+  }
+}
+```
+
+And it gets what you ask for. 
+
+```json
+{
+  "graphQLClient": {
+    "title": "GraphQL::Model",
+    "description": "A better way to write GraphQL queries in Ruby."
+  }
+}
+```
+
+[And more](https://github.com/benaubin/graphql-model/wiki/Fields).
 
 ## Development
 
