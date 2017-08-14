@@ -38,7 +38,7 @@ module GraphQL::Model
 
       # two variables are equal if their name and type match
       def ==(other)
-        other.is_a?(String) ? variable_name == other : name == other.name || type == other.type
+        other.is_a?(String) ? variable_name == other : name == other.name && type == other.type
       end
     end
   end
