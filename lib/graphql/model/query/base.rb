@@ -77,7 +77,7 @@ module GraphQL::Model
           end
         elsif block
           arr = [:"query #{self.class.name}"]
-          arr << (variables.empty? ? ' ' : variables)
+          arr << (variables.empty? ? ' ' : " (" + variables.values.map(&:definition).join(", ") + ")")
           arr << Selection.query(parent: self, &block).to_query
           arr += @dependent_fragments.flat_map(&:to_query)
 
