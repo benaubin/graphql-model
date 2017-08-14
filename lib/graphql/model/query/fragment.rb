@@ -14,7 +14,6 @@ module GraphQL::Model
 
       class << self
         def method_missing(name, type = nil, save: true, &block)
-          p name
           if type
             fragment = Fragment.new(name, type, &block)
             self._fragments[name.to_s.camelize(:lower).to_sym] = fragment if save

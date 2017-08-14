@@ -13,8 +13,6 @@ RSpec.describe GraphQL::Model::Query::Fragment do
         end
       end
 
-      query.to_query
-
       expect(query).to be_query([:person, [:"...personFields"], "fragment personFields on Person", [:name]])
     end
 

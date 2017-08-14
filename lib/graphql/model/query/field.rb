@@ -5,11 +5,11 @@ module GraphQL::Model
     class Field
       attr_accessor :name, :args, :field_alias, :sub_selection
 
-      def initialize(field_alias = nil, name, parent: parent, **args, &block)
+      def initialize(field_alias = nil, name, parent: nil, **args, &block)
         self.name = name
         self.field_alias = field_alias
         self.args = args
-        self.sub_selection = Query::Selection.query(parent: parent, &block) if block_given?
+        self.sub_selection = Selection.query(parent: parent, &block) if block_given?
       end
 
       def method_missing(method, *args)

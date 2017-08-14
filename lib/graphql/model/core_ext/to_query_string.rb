@@ -3,14 +3,15 @@ require 'graphql/model/core_ext/to_query_arg'
 
 class Array
   def to_query_string(indent: '  ', level: 0)
-    total_indent = (indent * level)
+    total_indent = (level > 0) ? (indent * level) : ''
     indented_line = "\n" + total_indent
 
-    str = (level == 0) ? '{' : ' {'
+    str = ""
+    str += (level == 0) ? '{' : ' {' unless level == -1
     each do |part|
       str += part.to_query_string(indent: indent, level: level + 1)
     end
-    str += indented_line + '}'
+    str += indented_line + '}' unless level == -1
     str += "\n" if level == 0
     str
   end
@@ -21,7 +22,7 @@ class Object
     total_indent = (indent * level)
     indented_line = "\n" + total_indent
 
-    indented_line + to_s
+    ((level > 0) ? indented_line : '') + to_s
   end
 end
 
