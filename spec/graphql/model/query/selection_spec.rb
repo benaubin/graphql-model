@@ -38,6 +38,7 @@ RSpec.describe GraphQL::Model::Query::Selection do
       end
       expect(query).to be_query(["ben: person", {id: 3}, [:name]])
     end
+
     it "can query a field with an alias and directives" do
       query = GraphQL::Model::Query::Selection.query do
         ben :person, _directive(foo: 'bar'), _include(if: true), id: 3 do

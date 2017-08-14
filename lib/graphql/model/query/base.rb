@@ -15,11 +15,12 @@ module GraphQL::Model
       class << self
         # creates a POST-able hash
         def query(operation_name: nil, **vars)
-          {
-              operation_name: operation_name,
+          q = {
               query: to_query_string,
               variables: vars
           }
+          q[:operation_name] = operation_name if operation_name
+          q
         end
 
         # retrieve variables, caches result
@@ -32,7 +33,7 @@ module GraphQL::Model
         end
 
         def to_query
-          @query ||= new.query **variables
+          @query ||= variables.empty? ? new.query : new.query(**variables)
         end
         
         def to_query_string(indent: '  ')
@@ -75,9 +76,12 @@ module GraphQL::Model
             self._variables[name] = Variable.new(name, type, required)
           end
         elsif block
-          @query = TopLevelArray.new([
-            :"query #{self.class.name}", variables, Selection.query(parent: self, &block).to_query
-          ] + @dependent_fragments.flat_map(&:to_query))
+          arr = [:"query #{self.class.name}"]
+          arr << (variables.empty? ? ' ' : variables)
+          arr << Selection.query(parent: self, &block).to_query
+          arr += @dependent_fragments.flat_map(&:to_query)
+
+          @query = TopLevelArray.new(arr)
         else
           @query
         end
