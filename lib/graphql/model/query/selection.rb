@@ -1,5 +1,6 @@
 require 'graphql/model/core_ext/to_query_string'
 require 'graphql/model/query/field'
+require 'graphql/model/query/directive'
 
 module GraphQL::Model
   module Query
@@ -21,17 +22,31 @@ module GraphQL::Model
         end
       end
 
-      def method_missing(field_alias = nil, field, **args, &block)
-        add_field field_alias, field, args, &block
-      end
+      def method_missing(*args, **opts, &block)
+        name, field_alias = args.reverse.drop_while{ |a| a.is_a? Directive }
+        directives        = args.select            { |a| a.is_a? Directive }
 
-      def add_field(field_alias = nil, name, **args, &block)
+        if field_alias.nil? && directives.empty? && name.to_s.start_with?("_")
+          name.to_s.sub("_", "@")
+          Directive.new(name, opts)
+        else
+          if name.is_a? Directive
+            super if name.nil?
+            directives = [name] + directives
+            name = field_alias
+            field_alias = nil
+          end
+          field_alias = nil if field_alias == name
+
+          add_field field_alias, name, directives: directives, **opts, &block
+        end
+      end
+      def add_field(field_alias = nil, name, directives: [], **args, &block)
         @query_cache = nil
-        fields << Field.new(field_alias, name, parent: self, **args, &block)
+        fields << Field.new(field_alias, name, directives, parent: self, **args, &block)
       end
 
       def to_query
-        p @dependent_fragments if @dependent_fragments.length > 1
         @query_cache ||= (@fields + @dependent_fragments).flat_map(&:to_query)
       end
 

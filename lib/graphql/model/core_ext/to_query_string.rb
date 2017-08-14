@@ -26,6 +26,13 @@ class Object
   end
 end
 
+class String
+  def to_query_string(indent: '  ', level: 0)
+    return self if start_with? ' '
+    super
+  end
+end
+
 class Hash
   def to_query_string(indent: '  ', level: 0)
     "(" + map do |k, v|

@@ -3,10 +3,11 @@ require 'active_support/core_ext/string/inflections'
 module GraphQL::Model
   module Query
     class Field
-      attr_accessor :name, :args, :field_alias, :sub_selection
+      attr_accessor :name, :args, :field_alias, :sub_selection, :directives
 
-      def initialize(field_alias = nil, name, parent: nil, **args, &block)
+      def initialize(field_alias = nil, name, directives, parent: nil, **args, &block)
         self.name = name
+        self.directives = directives
         self.field_alias = field_alias
         self.args = args
         self.sub_selection = Selection.query(parent: parent, &block) if block_given?
@@ -28,6 +29,7 @@ module GraphQL::Model
           query << name
         end
         query << args if args.length > 0
+        query += directives.flat_map(&:to_query) if directives.length > 0
         query << sub_selection.to_query if sub_selection
         query
       end
