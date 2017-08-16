@@ -2,6 +2,7 @@ require "graphql/model/version"
 require "graphql/model/query/selection"
 require "graphql/model/query/fragment"
 require "graphql/model/query/base"
+require "graphql/model/query/mutation"
 
 module GraphQL
   module Model
