@@ -17,7 +17,7 @@ module GraphQL::Model
         # creates a POST-able hash
         def query(operation_name: self.operation_name, **vars)
           {
-              operation_name: operation_name,
+              operationName: operation_name,
               query: to_query_string,
               variables: vars
           }

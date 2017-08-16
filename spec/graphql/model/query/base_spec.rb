@@ -53,7 +53,7 @@ GraphQL
     describe '.query' do
       it "creates a POST-able hash" do
         expect(starships_query.query(operation_name: :operation, first: 5)).to eq({
-          operation_name: :operation,
+          operationName: :operation,
           query: starships_query_string,
           variables: { first: 5 }
         })

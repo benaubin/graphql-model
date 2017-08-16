@@ -33,7 +33,7 @@ mutation CreateStarship ($starship: StarshipInput!){
     describe '.query' do
       it "creates a POST-able hash" do
         expect(create_starship.query(starship: {name: "The Newest Ship"})).to eq({
-                                                                                    operation_name: "CreateStarship",
+                                                                                    operationName: "CreateStarship",
                                                                                     query: starships_mutation_string,
                                                                                     variables: { starship: {
                                                                                         name: "The Newest Ship"
