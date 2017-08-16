@@ -7,6 +7,7 @@ module GraphQL::Model
     # A class to extend from to define a query
     class Base
       attr_accessor :_variables, :_getting_vars
+      attr_writer :operation_name
 
       def initialize
         @dependent_fragments = []
@@ -14,13 +15,20 @@ module GraphQL::Model
 
       class << self
         # creates a POST-able hash
-        def query(operation_name: nil, **vars)
-          q = {
+        def query(operation_name: self.operation_name, **vars)
+          {
+              operation_name: operation_name,
               query: to_query_string,
               variables: vars
           }
-          q[:operation_name] = operation_name if operation_name
-          q
+        end
+
+        def operation_name
+          @operation_name ||= self.name
+        end
+
+        def operation_type
+          :query
         end
 
         # retrieve variables, caches result
@@ -51,8 +59,11 @@ module GraphQL::Model
         def required_variables
           @required_variables ||= []
         end
+        def required_variables=(v)
+          @required_variables = v
+        end
 
-        def require_variable(**variables)
+        def require_variable(*variables)
           self.required_variables += variables
         end
         alias :require_variables :require_variable
@@ -76,7 +87,7 @@ module GraphQL::Model
             self._variables[name] = Variable.new(name, type, required)
           end
         elsif block
-          arr = [:"query #{self.class.name}"]
+          arr = [:"#{operation_type} #{operation_name}"]
           arr << (variables.empty? ? ' ' : " (" + variables.values.map(&:definition).join(", ") + ")")
           arr << Selection.query(parent: self, &block).to_query
           arr += @dependent_fragments.flat_map(&:to_query)
@@ -86,9 +97,15 @@ module GraphQL::Model
           @query
         end
       end
-      
       alias :to_query :query
-      
+
+      def operation_name
+        self.class.operation_name
+      end
+      def operation_type
+        self.class.operation_type
+      end
+
       def add_dependent_fragment(fragment)
         return fragment if @dependent_fragments.include? fragment
 
