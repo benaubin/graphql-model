@@ -1,6 +1,7 @@
 require 'graphql/model/core_ext/to_query_string'
 require 'graphql/model/query/field'
 require 'graphql/model/query/directive'
+require 'graphql/model/query/inline_fragment'
 
 module GraphQL::Model
   module Query
@@ -26,9 +27,12 @@ module GraphQL::Model
         name, field_alias = args.reverse.drop_while{ |a| a.is_a? Directive }
         directives        = args.select            { |a| a.is_a? Directive }
 
-        if field_alias.nil? && directives.empty? && name.to_s.start_with?("_")
-          name.to_s.sub("_", "@")
-          Directive.new(name, opts)
+        if field_alias.nil? && directives.empty? && (name.to_s =~ /(on)?_(\w+)?/)
+          if $1
+            fields << InlineFragment.new($2, parent: self, &block)
+          else
+            Directive.new(name, opts)
+          end
         else
           if name.is_a? Directive
             super if name.nil?
@@ -41,6 +45,7 @@ module GraphQL::Model
           add_field field_alias, name, directives: directives, **opts, &block
         end
       end
+
       def add_field(field_alias = nil, name, directives: [], **args, &block)
         @query_cache = nil
         fields << Field.new(field_alias, name, directives, parent: self, **args, &block)

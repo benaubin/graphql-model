@@ -70,6 +70,31 @@ RSpec.describe GraphQL::Model::Query::Selection do
     end
   end
 
+  describe "#on_[Type]" do
+    it "creates an inline fragment" do
+      selection = GraphQL::Model.query do
+        things do
+          id
+          on_People do
+            name
+          end
+        end
+      end
+
+      expect(selection.to_query).to eq([:things, [:id, :"... on People", [:name]]])
+      expect(selection.to_query_string).to eq(<<-GRAPHQL)
+{
+  things {
+    id
+    ... on People {
+      name
+    }
+  }
+}
+GRAPHQL
+    end
+  end
+
   describe "#add_field" do
     it "adds a field" do
       selection = GraphQL::Model::Query::Selection.new
