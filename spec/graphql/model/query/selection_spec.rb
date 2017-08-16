@@ -75,18 +75,18 @@ RSpec.describe GraphQL::Model::Query::Selection do
       selection = GraphQL::Model.query do
         things do
           id
-          on_People do
+          on_Person do
             name
           end
         end
       end
 
-      expect(selection.to_query).to eq([:things, [:id, :"... on People", [:name]]])
+      expect(selection.to_query).to eq([:things, [:id, :"... on Person", [:name]]])
       expect(selection.to_query_string).to eq(<<-GRAPHQL)
 {
   things {
     id
-    ... on People {
+    ... on Person {
       name
     }
   }
