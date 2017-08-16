@@ -26,7 +26,7 @@ RSpec.describe GraphQL::Model::Query::Base do
       StarshipsQuery
     }
     let(:starships_query_string) {<<-GraphQL
-query StarshipsQuery($first: Int) {
+query StarshipsQuery ($first: Int = 3){
   allStarships(first: $first) {
     starships {
       ...starshipFields

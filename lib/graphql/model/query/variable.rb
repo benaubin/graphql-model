@@ -21,13 +21,13 @@ module GraphQL::Model
       end
 
       def variable_name
-        "$#{name}#{required ? '!' : ''}"
+        "$#{name}"
       end
       alias :to_s            :variable_name
       alias :to_query_arg    :variable_name
 
       def definition
-        definition = "#{variable_name}: #{type}"
+        definition = "#{variable_name}: #{type}#{required ? '!' : ''}"
         definition << " = #{default_value.to_query_arg}" unless self.default_value.nil?
         definition
       end

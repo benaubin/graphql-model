@@ -15,7 +15,7 @@ RSpec.describe GraphQL::Model::Query::Variable do
     it "returns a required! variable name" do
       variable = GraphQL::Model::Query::Variable.new :var, :String, true
 
-      expect(variable.variable_name).to eq("$var!")
+      expect(variable.variable_name).to eq("$var")
     end
   end
 
@@ -33,12 +33,12 @@ RSpec.describe GraphQL::Model::Query::Variable do
     it "returns a required variable definition" do
       variable = GraphQL::Model::Query::Variable.new :var, :String, true
 
-      expect(variable.definition).to eq("$var!: String")
+      expect(variable.definition).to eq("$var: String!")
     end
     it "returns a required default variable definition" do
       variable = GraphQL::Model::Query::Variable.new :var, {String: "default"}, true
 
-      expect(variable.definition).to eq('$var!: String = "default"')
+      expect(variable.definition).to eq('$var: String! = "default"')
     end
   end
 end
