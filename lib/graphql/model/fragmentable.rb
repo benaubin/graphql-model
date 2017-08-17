@@ -18,6 +18,11 @@ module GraphQL::Model
         @tracked_fragments ||= {}
       end
 
+      # get & set the type of this model as used in the schema
+      def schema_type(type: nil)
+        (@schema_type = type) || self.name
+      end
+
       # an accessor for the tracked_fragments hash.
       #
       # using tracked fragments allows us to know where in a query a fragment was included, later allowing
@@ -28,7 +33,7 @@ module GraphQL::Model
 
       # returns a fragment for retrieving the attributes of the model
       def fragment
-        @fragment ||= Query::Fragment.new "#{name}Fields".to_sym, graphql_type.to_sym, selection
+        @fragment ||= Query::Fragment.new "#{name}Fields".to_sym, schema_type.to_sym, selection
       end
 
       def selection
@@ -38,6 +43,20 @@ module GraphQL::Model
         @selection.fields = attributes.map { |attr| attribute_field(attr) }
         @fragment = nil
         @selection
+      end
+
+      def model_fragments_to_model!(paths, data)
+        paths.each do |path|
+          model_parent = path[0..-2].inject(data) { |obj, part| obj[part] }
+          model_data = model_parent[path[-1]]
+
+          if model_data.is_a? Array
+            model_data.map! { |d| self.from_fields d }
+          else
+            model_parent[path[-1]] = self.from_fields model_data
+          end
+        end
+        data
       end
     end
   end

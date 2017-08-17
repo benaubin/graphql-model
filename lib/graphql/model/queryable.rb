@@ -31,6 +31,24 @@ module GraphQL::Model
       def query_hash(name, **vars)
         queries[name].query(**vars)
       end
+
+      def query_data(name, __ignore_errors: false, **vars)
+        q = query_hash(name, **vars)
+        response = send_query(q).parse.with_indifferent_access
+        unless __ignore_errors || response[:errors].nil?
+          response[:errors].each do |error|
+            loc = error[:locations][0]
+            raise ServerParseError.new error[:message], loc[:line], loc[:column], q[:query]
+          end
+        end
+        response[:data]
+      end
+
+      def query(name, __ignore_errors: false, **vars)
+        data = query_data name, __ignore_errors: __ignore_errors, **vars
+        model_fragments_to_model! tracked_fragment(name).paths, data
+        data
+      end
     end
   end
 end
