@@ -6,10 +6,10 @@ module GraphQL::Model
     class Fragment
       attr_accessor :name, :type, :selection
 
-      def initialize(name, type, &block)
+      def initialize(name, type, selection = nil, &block)
         self.name = name
         self.type = type
-        self.selection = Query::Selection.query(&block)
+        self.selection = selection || Query::Selection.query(&block)
       end
 
       class << self
@@ -40,13 +40,15 @@ module GraphQL::Model
       def fragment_name
         @fragment_name ||= name.to_s.camelize(:lower).to_sym
       end
+
       def type_name
         @type_name ||= type.to_s.camelize.to_sym
       end
 
-      def to_query
+      def to_query(path = [])
         query = [header]
-        query << selection.to_query
+
+        query << selection.to_query(path << header)
 
         @query ||= query
       end
@@ -56,10 +58,10 @@ module GraphQL::Model
       end
 
       private
-
       def header
         @header ||= [:fragment, fragment_name, :on, type_name].join(" ")
       end
+
       def reset_header_cache
         @fragment_name = nil
         @type_name = nil

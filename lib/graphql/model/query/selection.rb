@@ -15,10 +15,10 @@ module GraphQL::Model
       end
 
       class << self
-        def query(parent: nil, &block)
+        def query(parent: nil, cache: true, &block)
           query = Selection.new(parent: parent)
           query.send :instance_exec, &block
-          query.to_query
+          query.to_query if cache
           query
         end
       end
@@ -48,11 +48,11 @@ module GraphQL::Model
 
       def add_field(field_alias = nil, name, directives: [], **args, &block)
         @query_cache = nil
-        fields << Field.new(field_alias, name, directives, parent: self, **args, &block)
+        fields << Field.new(field_alias, name, directives, __parent: self, **args, &block)
       end
 
-      def to_query
-        @query_cache ||= (@fields + @dependent_fragments).flat_map(&:to_query)
+      def to_query(path = [])
+        @query_cache ||= (@fields + @dependent_fragments).flat_map{ |f| f.to_query(path.dup) }
       end
 
       def _(fragment)

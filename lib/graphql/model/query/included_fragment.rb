@@ -10,7 +10,9 @@ module GraphQL::Model
         self.fragment = fragment
       end
 
-      def to_query
+      def to_query(path = [])
+        fragment.included!(path) if fragment.respond_to? :included!
+
         [:"...#{fragment.fragment_name}"]
       end
     end
