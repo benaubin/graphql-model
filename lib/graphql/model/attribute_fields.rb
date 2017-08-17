@@ -5,6 +5,22 @@ module GraphQL::Model
   module AttributeFields
     extend ActiveSupport::Concern
 
+    included do
+      protected
+
+      def attributes
+        self.class.attributes
+      end
+
+      def attribute_field_name(attr)
+        self.class.attribute_field_name(attr)
+      end
+
+      def attribute_field(attr)
+        self.class.attribute_field_name(attr)
+      end
+    end
+
     class_methods do
       # adds attributes & associated methods and fields to a model
       def attributes(*attrs)

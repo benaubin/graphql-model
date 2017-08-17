@@ -39,21 +39,7 @@ module GraphQL
       end
 
       def to_h
-        attributes.inject({}) { |obj, attr| obj.merge(a: self.send(attr)) }
-      end
-
-      protected
-
-      def attributes
-        self.class.attributes
-      end
-
-      def attribute_field_name(attr)
-        self.class.attribute_field_name(attr)
-      end
-
-      def attribute_field(attr)
-        self.class.attribute_field_name(attr)
+        attributes.inject({}) { |obj, attr| obj.merge(attr => self.send(attr)) }
       end
     end
 
