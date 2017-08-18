@@ -20,37 +20,34 @@ Or install it yourself as:
 
 ## Usage
 
-Write it as Ruby.
+Define your class.
 
 ```ruby
-query = GraphQL::Model.query do
-  graphQLClient(language: :ruby, best: true) do
-    title
-    description
+class Character < GraphQL::Model::Base
+  attributes :name, :appears_in
+
+  graphql_path "http://graphql-ruby-demo.herokuapp.com/queries"
+
+  define_query :hero do
+    def query(episode: :Episode)
+      f = fragment
+      super do
+        hero(episode: episode) do
+          _ f
+        end
+      end
+    end
   end
-end.to_query_string
+end
 ```
 
-It works just like GraphQL.
+And write your queries.
 
-```graphql
-{
-  graphQLClient(language: ruby, best: true) {
-    title
-    description
-  }
-}
-```
-
-And it gets what you ask for. 
-
-```json
-{
-  "graphQLClient": {
-    "title": "GraphQL::Model",
-    "description": "A better way to write GraphQL queries in Ruby."
-  }
-}
+```ruby
+ $ Character.query_hero(episode: :EMPIRE)
+=> {
+     "hero" => Character<name: "Luke Skywalker", appears_in: ["NEWHOPE", "EMPIRE", "JEDI"]>
+   }
 ```
 
 [And more](https://github.com/benaubin/graphql-model/wiki/Fields).
