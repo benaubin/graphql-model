@@ -41,7 +41,7 @@ class Character < GraphQL::Model::Base
 end
 ```
 
-And write your queries.
+Then execute your queries.
 
 ```ruby
  $ Character.query_hero(episode: :EMPIRE)
@@ -50,7 +50,7 @@ And write your queries.
    }
 ```
 
-[And more](https://github.com/benaubin/graphql-model/wiki/Fields).
+[Learn more](https://github.com/benaubin/graphql-model/wiki/Fields).
 
 ## Development
 
